@@ -39,4 +39,4 @@ Rebuild the plans after changing the model (needs Python with pulp, highspy, num
 cd model && python build_data.py
 ```
 
-The sliders move in steps of 5% because each setting's plan is solved in advance by the model.
+The sliders move in 1% steps; every step's plan is solved in advance by the model (identical plans are stored once).

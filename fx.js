@@ -3,7 +3,7 @@
 (function () {
   const css = document.createElement("link");
   css.rel = "stylesheet";
-  css.href = "fx.css";
+  css.href = "fx.css?v=3";
   document.head.appendChild(css);
 
   const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -23,18 +23,7 @@
     });
   }
 
-  // ------------------------------------------------ pointer spotlight + tilt
-  const spot = document.createElement("span");
-  spot.className = "spot";
-  document.querySelector(".backdrop").appendChild(spot);
-  let sx = innerWidth / 2, sy = innerHeight / 3, tx = sx, ty = sy;
-  (function follow() {
-    sx += (tx - sx) * 0.08;
-    sy += (ty - sy) * 0.08;
-    spot.style.transform = `translate(${sx}px, ${sy}px)`;
-    requestAnimationFrame(follow);
-  })();
-
+  // ------------------------------------------------ card tilt
   let hovered = null;
   function release(card) {
     card.classList.remove("fx-hover");

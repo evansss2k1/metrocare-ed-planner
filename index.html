@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Metro Care ED Planner</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
 <div class="backdrop" aria-hidden="true">
@@ -23,7 +23,7 @@
 
     <div class="control">
       <label for="extra">More or fewer patients <output id="extraOut">0%</output></label>
-      <input type="range" id="extra" min="-10" max="30" step="5" value="0">
+      <input type="range" id="extra" min="-10" max="30" step="1" value="0">
       <p class="help">+10% means 10 extra patients for every 100 we normally see.</p>
     </div>
 
@@ -50,7 +50,7 @@
 
     <div class="control">
       <label for="ot">Most overtime allowed <output id="otOut">25%</output></label>
-      <input type="range" id="ot" min="0" max="50" step="5" value="25">
+      <input type="range" id="ot" min="0" max="50" step="1" value="25">
       <p class="help">25% means up to 1 extra person on overtime for every 4 on the shift.</p>
     </div>
 
@@ -160,12 +160,13 @@
   </main>
 </div>
 
-<script src="data/params.js"></script>
-<script src="data/days.js"></script>
-<script src="data/plans.js"></script>
-<script src="data/baseline.js"></script>
-<script src="simulate.js"></script>
-<script src="app.js"></script>
-<script src="fx.js"></script>
+<!-- ?v= makes browsers fetch fresh copies after an update instead of old cached ones -->
+<script src="data/params.js?v=3"></script>
+<script src="data/days.js?v=3"></script>
+<script src="data/plans.js?v=3"></script>
+<script src="data/baseline.js?v=3"></script>
+<script src="simulate.js?v=3"></script>
+<script src="app.js?v=3"></script>
+<script src="fx.js?v=3"></script>
 </body>
 </html>

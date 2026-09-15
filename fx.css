@@ -13,12 +13,6 @@
 }
 .tile, .shift, .plan-card, .step, .card, .reco { position: relative; }
 
-/* pointer spotlight behind the glass */
-.spot { position: absolute; left: 0; top: 0; width: 560px; height: 560px; margin: -280px 0 0 -280px; border-radius: 50%;
-  pointer-events: none; opacity: 0; transition: opacity 0.5s; will-change: transform;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.85), rgba(127, 196, 194, 0.35) 38%, transparent 70%); }
-body.pointer-in .spot { opacity: 1; }
-
 /* glare that follows the pointer on cards */
 .glare { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 2; opacity: 0;
   transition: opacity 0.35s ease; mix-blend-mode: soft-light;

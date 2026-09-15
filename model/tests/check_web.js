@@ -30,6 +30,21 @@ for (const k of ["A", "B", "C", "D"]) {
   check(`${k} good days`, r.p_target_day, b.p_target_day, 0.002, false);
   check(`${k} overtime in >1 shift`, r.p_ot_multi, b.p_ot_multi, 0.002, false);
 }
+// Stress tests from the Excel Sensitivity sheet and the report: rosters stay fixed, only the situation changes.
+const STRESS = [
+  ["A arrivals +15%", plans.A, { muMult: 1.15 }, 772137],
+  ["D arrivals +15%", P.D, { muMult: 1.15 }, 534463],
+  ["A absenteeism x2", plans.A, { absMult: 2 }, 624545],
+  ["D absenteeism x2", P.D, { absMult: 2 }, 459163],
+  ["A no overtime", plans.A, { otCap: 0 }, 639544],
+  ["D no overtime", P.D, { otCap: 0 }, 494102],
+  ["D incident on 8% of days", P.D, { incP: 0.08 }, 426054],
+];
+for (const [label, plan, o, want] of STRESS) {
+  check(label, MC.simulate(plan, P, U, { share, ...o }).exp_total, want, 0.005, true);
+}
+check("D coverage at arrivals +15%", MC.simulate(P.D, P, U, { share, muMult: 1.15 }).coverage, 0.9513, 0.002, false);
+
 const short = MC.simulate(P.D, P, U, { share, unavailable: { "Doctor|Evening": 1 } });
 check("D with 1 evening doctor missing", short.exp_total, 432895, 0.005, true);
 

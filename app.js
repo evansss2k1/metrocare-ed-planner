@@ -254,7 +254,10 @@
     $("otOut").textContent = s.ot + "%";
     paintSlider($("extra"));
     paintSlider($("ot"));
-    const plans = { D: P.D, A: s.entry.A, B: s.entry.B, C: s.entry.C };
+    // The four rosters stay fixed, exactly as in the Excel Sensitivity sheet and the report: the sidebar changes the
+    // situation (patients, sick leave, emergencies, overtime room), not the plans. Only the absence fix is re-planned.
+    const base = ALL_PLANS["0|25"];
+    const plans = { D: P.D, A: base.A, B: base.B, C: base.C };
     const res = {};
     for (const k of Object.keys(plans)) if (plans[k]) res[k] = MC.simulate(plans[k], P, U, s.opts);
     renderPlan(plans, res, s);
@@ -287,8 +290,15 @@
   }
 
   document.querySelectorAll(".tabs button").forEach(btn => btn.addEventListener("click", () => openTab(btn)));
+  // While a slider is dragged, redraw at most once per screen refresh so the thumb glides smoothly.
+  let pending = false;
+  function scheduleRender() {
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(() => { pending = false; renderAll(); });
+  }
   ["extra", "sick", "emerg", "ot", "absStaff", "absShift", "absN", "soFar", "hours", "emergencyNow"]
-    .forEach(id => $(id).addEventListener("input", renderAll));
+    .forEach(id => $(id).addEventListener("input", scheduleRender));
   $("busyShift").addEventListener("change", () => {
     $("soFar").value = Math.round(P.MU[$("busyShift").value] * settings().opts.muMult / 2);
     renderAll();
