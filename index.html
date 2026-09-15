@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Metro Care ED Planner</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="backdrop" aria-hidden="true">
+  <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span><span class="blob b4"></span>
+</div>
+
+<div class="layout">
+  <aside class="side glass">
+    <div class="brand">
+      <span class="brand-mark">M</span>
+      <div><strong>Metro Care</strong><small>Emergency Department</small></div>
+    </div>
+
+    <h2>Change the situation</h2>
+    <p class="muted">Everything starts at a normal day. Change something to see how the plans cope.</p>
+
+    <div class="control">
+      <label for="extra">More or fewer patients <output id="extraOut">0%</output></label>
+      <input type="range" id="extra" min="-10" max="30" step="5" value="0">
+      <p class="help">+10% means 10 extra patients for every 100 we normally see.</p>
+    </div>
+
+    <div class="control">
+      <label for="sick">Staff calling in sick</label>
+      <select id="sick">
+        <option value="0.5">Low</option>
+        <option value="1" selected>Normal</option>
+        <option value="2">High</option>
+        <option value="3">Very high</option>
+      </select>
+    </div>
+
+    <div class="control">
+      <label for="emerg">Big emergencies</label>
+      <select id="emerg">
+        <option value="0.02">Rare (2% of days)</option>
+        <option value="0.04" selected>Normal (4% of days)</option>
+        <option value="0.08">Frequent (8% of days)</option>
+        <option value="0.15">Very frequent (15% of days)</option>
+      </select>
+      <p class="help">On an emergency day, one shift gets 35% more patients.</p>
+    </div>
+
+    <div class="control">
+      <label for="ot">Most overtime allowed <output id="otOut">25%</output></label>
+      <input type="range" id="ot" min="0" max="50" step="5" value="25">
+      <p class="help">25% means up to 1 extra person on overtime for every 4 on the shift.</p>
+    </div>
+
+    <button id="reset" type="button" class="btn">Back to normal</button>
+  </aside>
+
+  <main>
+    <header class="hero">
+      <h1>Emergency Department Planner</h1>
+      <p class="lead">How many doctors, nurses and technicians do we need in each shift, and what does each choice really cost?</p>
+      <div class="chips">
+        <span class="chip">2,000 simulated days</span>
+        <span class="chip">Works offline</span>
+        <span class="chip" id="checkChip">Checking numbers...</span>
+      </div>
+    </header>
+
+    <nav class="tabs glass" role="tablist">
+      <span class="tab-ink" aria-hidden="true"></span>
+      <button role="tab" data-tab="plan" aria-selected="true">Our plan</button>
+      <button role="tab" data-tab="compare" aria-selected="false">Compare plans</button>
+      <button role="tab" data-tab="absent" aria-selected="false">Someone is absent</button>
+      <button role="tab" data-tab="busy" aria-selected="false">Busy shift check</button>
+      <button role="tab" data-tab="how" aria-selected="false">How it works</button>
+    </nav>
+
+    <section class="panel" id="tab-plan"></section>
+
+    <section class="panel" id="tab-compare" hidden></section>
+
+    <section class="panel" id="tab-absent" hidden>
+      <div class="card glass">
+        <h3>Someone is absent</h3>
+        <p class="muted">Pick who is missing. We check what happens to the recommended plan and what to do about it.</p>
+        <div class="row">
+          <label>Who is missing?
+            <select id="absStaff">
+              <option value="Doctor">Doctors</option><option value="Nurse">Nurses</option><option value="Technician">Technicians</option>
+            </select>
+          </label>
+          <label>Which shift?
+            <select id="absShift">
+              <option>Morning</option><option selected>Evening</option><option>Night</option>
+            </select>
+          </label>
+          <label>How many?
+            <select id="absN"><option>1</option><option>2</option><option>3</option></select>
+          </label>
+        </div>
+      </div>
+      <div id="absentResult"></div>
+    </section>
+
+    <section class="panel" id="tab-busy" hidden>
+      <div class="card glass">
+        <h3>Busy shift check</h3>
+        <p class="muted">Use this during a shift. Enter how many patients have arrived so far.</p>
+        <div class="row">
+          <label>Shift
+            <select id="busyShift"><option>Morning</option><option selected>Evening</option><option>Night</option></select>
+          </label>
+          <label>Patients so far <input type="number" id="soFar" min="0" max="500" value="60"></label>
+          <label>Hours since the shift started <input type="number" id="hours" min="0.5" max="8" step="0.5" value="4"></label>
+        </div>
+        <label class="switch"><input type="checkbox" id="emergencyNow"><span class="track"><span class="knob"></span></span>
+          A big emergency has been declared in the city</label>
+      </div>
+      <div id="busyResult"></div>
+    </section>
+
+    <section class="panel" id="tab-how" hidden>
+      <div class="steps">
+        <div class="step glass" style="--i:0"><span class="num">1</span><h4>Build a plan</h4>
+          <p>The computer finds the cheapest number of staff that still follows the hospital rules. This maths method is called <i>linear programming</i>.</p></div>
+        <div class="step glass" style="--i:1"><span class="num">2</span><h4>Test the plan</h4>
+          <p>We play out 2,000 made-up days: some busy, some quiet, some with staff off sick or a big emergency. This is called a <i>simulation</i>.</p></div>
+        <div class="step glass" style="--i:2"><span class="num">3</span><h4>Add up the real cost</h4>
+          <p>Wages and beds, plus overtime, plus ₹6,000 for a patient not seen in time, ₹9,500 for a patient sent away and ₹1,200 for each hour waiting for a bed.</p></div>
+      </div>
+      <div class="two">
+        <div class="card glass">
+          <h3>Hospital rules the plans follow</h3>
+          <ul class="ticks">
+            <li>At least 1 doctor for every 2 nurses.</li>
+            <li>At least 2 technicians per shift, and at least 4 doctors at night.</li>
+            <li>Planned staff must be able to see at least 95% of the patients we expect.</li>
+            <li>A doctor sees about 18 patients a shift, a nurse 12 and a technician 30. Very sick patients count as 1.5.</li>
+          </ul>
+        </div>
+        <div class="card glass">
+          <h3>Words used</h3>
+          <dl class="words">
+            <dt>Overtime</dt><dd>A staff member working an extra shift for higher pay.</dd>
+            <dt>Sent to another hospital</dt><dd>The patient cannot be taken in because the beds are full.</dd>
+            <dt>Real cost</dt><dd>What a plan costs once missed patients are counted, not just wages.</dd>
+          </dl>
+        </div>
+      </div>
+      <div class="card glass">
+        <h3>Good to know</h3>
+        <ul class="ticks">
+          <li>Everything runs on this computer. No internet is needed.</li>
+          <li id="selfCheck">Checking the numbers against the Excel model...</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="data/params.js"></script>
+<script src="data/days.js"></script>
+<script src="data/plans.js"></script>
+<script src="data/baseline.js"></script>
+<script src="simulate.js"></script>
+<script src="app.js"></script>
+<script src="fx.js"></script>
+</body>
+</html>

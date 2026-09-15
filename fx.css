@@ -1,0 +1,136 @@
+/* Interaction effects: richer glass, ripples, spring presses, 3D tilt with glare, shine sweeps,
+   animated borders, slider bubbles and a springy toggle. Loaded by fx.js. */
+:root { --spring: cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+@property --angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+
+/* ------------------------------------------------ richer glass */
+.glass, .tile {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.40));
+  border-color: rgba(255, 255, 255, 0.9) rgba(255, 255, 255, 0.35) rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.85);
+  box-shadow: 0 12px 40px rgba(15, 60, 70, 0.13), 0 2px 6px rgba(15, 60, 70, 0.05),
+              inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+}
+.tile, .shift, .plan-card, .step, .card, .reco { position: relative; }
+
+/* pointer spotlight behind the glass */
+.spot { position: absolute; left: 0; top: 0; width: 560px; height: 560px; margin: -280px 0 0 -280px; border-radius: 50%;
+  pointer-events: none; opacity: 0; transition: opacity 0.5s; will-change: transform;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.85), rgba(127, 196, 194, 0.35) 38%, transparent 70%); }
+body.pointer-in .spot { opacity: 1; }
+
+/* glare that follows the pointer on cards */
+.glare { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 2; opacity: 0;
+  transition: opacity 0.35s ease; mix-blend-mode: soft-light;
+  background: radial-gradient(380px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.95), transparent 55%); }
+.fx-hover > .glare { opacity: 1; }
+.tile, .shift, .plan-card, .step, .reco { transition: transform 0.6s var(--spring), box-shadow 0.4s ease; will-change: transform; }
+.fx-hover { box-shadow: 0 24px 50px rgba(15, 60, 70, 0.18), inset 0 1px 0 rgba(255, 255, 255, 1) !important; }
+
+/* ------------------------------------------------ ripples */
+.ripple { position: absolute; border-radius: 50%; pointer-events: none; z-index: 3; transform: scale(0); opacity: 0.5;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.35) 60%, transparent 70%);
+  animation: ripple 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.ripple.dark { background: radial-gradient(circle, rgba(15, 82, 87, 0.28), rgba(15, 82, 87, 0.1) 60%, transparent 70%); }
+@keyframes ripple { to { transform: scale(1); opacity: 0; } }
+.tabs button, .btn, .track { overflow: hidden; }
+
+/* ------------------------------------------------ spring presses */
+.btn { position: relative; transition: transform 0.45s var(--spring), box-shadow 0.3s ease; }
+.btn:active { transform: scale(0.95) !important; transition-duration: 0.1s; }
+.tabs button { transition: color 0.3s ease, transform 0.45s var(--spring); }
+.tabs button:active { transform: scale(0.92); transition-duration: 0.1s; }
+select, input[type=number] { transition: border-color 0.2s, box-shadow 0.3s, background-color 0.2s, transform 0.4s var(--spring); }
+select:focus-visible, input[type=number]:focus-visible { transform: translateY(-2px); }
+select:active { transform: scale(0.98); }
+.chip, .brand-mark { transition: transform 0.45s var(--spring); }
+.chip:hover { transform: translateY(-2px); }
+.brand-mark:hover { transform: rotate(-12deg) scale(1.1); }
+
+/* shine sweep on buttons */
+.btn::after { content: ""; position: absolute; top: 0; left: -70%; width: 45%; height: 100%; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.5), transparent); transform: skewX(-20deg);
+  transition: left 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+.btn:hover::after { left: 130%; }
+.btn svg { width: 16px; height: 16px; vertical-align: -3px; margin-right: 8px; transition: transform 0.7s var(--spring); }
+.btn.spin svg { transform: rotate(-360deg); }
+
+/* ------------------------------------------------ tabs: springy pill with a shine */
+.tab-ink { transition: transform 0.7s var(--spring), width 0.7s var(--spring); overflow: hidden; }
+.tab-ink::after { content: ""; position: absolute; inset: 0; transform: translateX(-120%);
+  background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, 0.55) 50%, transparent 80%); }
+.tab-ink.flash::after { animation: sweep 0.8s 0.15s ease forwards; }
+@keyframes sweep { to { transform: translateX(120%); } }
+
+/* panels and cards enter with a spring */
+.panel { animation: panelIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes panelIn { from { opacity: 0; transform: translateY(18px) scale(0.985); } to { opacity: 1; transform: none; } }
+.just-opened .tile, .just-opened .shift, .just-opened .plan-card, .step {
+  animation: riseSpring 0.8s var(--spring) both; animation-delay: calc(var(--i, 0) * 70ms); }
+@keyframes riseSpring {
+  from { opacity: 0; transform: perspective(800px) translateY(28px) rotateX(10deg) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+
+/* numbers pop when they change */
+.tile.bump .value { animation: bump 0.6s var(--spring); }
+@keyframes bump { 35% { transform: scale(1.1); color: var(--teal-2); } }
+.tile.bad.bump .value { animation-name: bumpBad; }
+@keyframes bumpBad { 35% { transform: scale(1.1); color: #d0664b; } }
+.tile .value { transform-origin: left center; }
+
+/* ------------------------------------------------ animated borders on the highlights */
+.reco::before, .plan-card:has(.badge)::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 2px; pointer-events: none;
+  background: conic-gradient(from var(--angle), transparent 0 55%, rgba(255, 255, 255, 0.95) 72%, transparent 88%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude; animation: spinBorder 4.5s linear infinite; }
+.plan-card:has(.badge)::after { background: conic-gradient(from var(--angle), transparent 0 55%, var(--teal-2) 72%, transparent 88%); }
+@keyframes spinBorder { to { --angle: 360deg; } }
+.badge { animation: badgeGlow 2.4s ease-in-out infinite; }
+@keyframes badgeGlow { 50% { box-shadow: 0 0 0 4px rgba(15, 82, 87, 0.18); } }
+
+/* ------------------------------------------------ sliders: bigger thumb, halo, value bubble */
+.range-wrap { position: relative; display: block; padding: 6px 0; }
+input[type=range]::-webkit-slider-thumb { transition: transform 0.4s var(--spring), box-shadow 0.3s ease; }
+input[type=range]:active::-webkit-slider-thumb {
+  transform: scale(1.35); box-shadow: 0 0 0 9px rgba(15, 82, 87, 0.14), 0 4px 14px rgba(15, 82, 87, 0.4); }
+input[type=range] { transition: box-shadow 0.3s; }
+.bubble { position: absolute; bottom: calc(100% + 4px); padding: 3px 9px; border-radius: 8px; font-size: 0.78rem; font-weight: 700;
+  color: #fff; background: var(--teal); white-space: nowrap; pointer-events: none;
+  transform: translate(-50%, 8px) scale(0.4); opacity: 0; transition: transform 0.4s var(--spring), opacity 0.2s ease; }
+.bubble::after { content: ""; position: absolute; left: 50%; top: 100%; margin-left: -5px; border: 5px solid transparent; border-top-color: var(--teal); }
+.range-wrap.active .bubble { transform: translate(-50%, 0) scale(1); opacity: 1; }
+output.pop { animation: pop 0.45s var(--spring); }
+@keyframes pop { 40% { transform: scale(1.25); } }
+
+/* ------------------------------------------------ springy toggle */
+.track { transition: background 0.4s ease, box-shadow 0.4s ease; }
+.knob { transition: transform 0.55s var(--spring), width 0.3s var(--spring); }
+.switch:hover .track { box-shadow: 0 0 0 6px rgba(15, 82, 87, 0.08); }
+.switch:active .knob { width: 27px; }
+.switch input:checked + .track { box-shadow: 0 0 0 4px rgba(181, 84, 60, 0.18), 0 0 20px rgba(181, 84, 60, 0.5); }
+.switch:active input:checked + .track .knob { transform: translateX(11px); }
+.particle { position: fixed; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; pointer-events: none; z-index: 100;
+  animation: burst 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+@keyframes burst { to { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; } }
+
+/* ------------------------------------------------ busy signal */
+.signal.morph { animation: morph 0.7s var(--spring); }
+@keyframes morph { from { transform: scale(0.94); opacity: 0.4; } to { transform: none; opacity: 1; } }
+.signal.pulse { animation: breathe 2.2s ease-in-out infinite; }
+.signal.pulse.morph { animation: morph 0.7s var(--spring), breathe 2.2s 0.7s ease-in-out infinite; }
+@keyframes breathe { 50% { box-shadow: 0 20px 55px color-mix(in srgb, var(--c) 60%, transparent); } }
+.signal.shake { animation: shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97), breathe 2.2s 0.6s ease-in-out infinite; }
+@keyframes shake {
+  10%, 90% { transform: translateX(-2px); } 20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-7px); } 40%, 60% { transform: translateX(7px); } }
+.gauge .seg { box-shadow: 0 0 16px color-mix(in srgb, var(--c, #0F5257) 45%, transparent); }
+
+/* action list items slide in one by one */
+.actions li:nth-child(2) { animation-delay: 0.08s; }
+.actions li:nth-child(3) { animation-delay: 0.16s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .spot, .glare, .ripple, .particle, .bubble { display: none !important; }
+}
