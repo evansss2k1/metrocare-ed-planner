@@ -3,13 +3,13 @@
 (function () {
   const css = document.createElement("link");
   css.rel = "stylesheet";
-  css.href = "fx.css?v=3";
+  css.href = "fx.css?v=7";
   document.head.appendChild(css);
 
   const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const FINE = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-  const TILT = ".tile, .shift, .plan-card, .step, .reco";
-  const GLARE = ".tile, .shift, .plan-card, .step, .reco, .card";
+  const TILT = ".stat, .lane, .flow-card, .step";
+  const GLARE = ".tile, .step, .glass:not(.topbar)";
   if (REDUCED) return;
 
   // ------------------------------------------------ glare layers on every card (cards are re-rendered, so keep watching)
@@ -46,7 +46,7 @@
     card.style.setProperty("--mx", px * 100 + "%");
     card.style.setProperty("--my", py * 100 + "%");
     if (card.matches(TILT)) {
-      const max = card.matches(".reco") ? 3 : 8;
+      const max = card.matches(".lane") ? 2 : 7;
       card.style.transition = "transform 0.18s ease-out, box-shadow 0.4s ease";
       card.style.transform = `perspective(900px) rotateX(${(0.5 - py) * max}deg) rotateY(${(px - 0.5) * max}deg) translateY(-5px)`;
     }
@@ -151,6 +151,7 @@
     root.querySelectorAll(".count").forEach(c => {
       if (Math.abs(+c.dataset.from - +c.dataset.to) > 1e-9) {
         const tile = c.closest(".tile");
+        if (!tile) return;   // e.g. the dial's centre number is not inside a card
         setTimeout(() => { tile.classList.remove("bump"); void tile.offsetWidth; tile.classList.add("bump"); }, 520);
       }
     });
